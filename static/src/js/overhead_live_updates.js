@@ -8,14 +8,9 @@ import { onWillStart, onWillUnmount } from "@odoo/owl";
 patch(FormController.prototype, {
     setup() {
         super.setup();
-
-        if (this.props.resModel !== 'sale.order') {
-            return;
-        }
-
+        if (this.props.resModel !== 'sale.order') return;
         this.busService = useService("bus_service");
         this.notification = useService("notification");
-
         this.channel = "sale_margin_overhead_changed";
 
         onWillStart(() => {
@@ -27,14 +22,9 @@ patch(FormController.prototype, {
 
         this.busService.addEventListener("notification", (ev) => {
             const notifications = ev.detail || [];
-
             for (const notif of notifications) {
-                if (notif.channel !== this.channel) {
-                    continue;
-                }
-
+                if (notif.channel !== this.channel) continue;
                 const payload = notif.payload;
-
                 if (payload?.type === "overhead_updated") {
                     console.log(">>> Overhead update received", payload);
 
