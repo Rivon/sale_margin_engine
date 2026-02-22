@@ -1,0 +1,13 @@
+.o_margin_card {
+    border-radius: 12px;
+
+    .o_stat_value {
+        font-size: 1.4rem;
+        font-weight: 600;
+    }
+
+    .progress {
+        height: 8px;
+        border-radius: 6px;
+    }
+}

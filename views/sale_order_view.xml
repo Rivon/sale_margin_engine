@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_order_form_margin_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.margin.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Add after Amount Total -->
+            <xpath expr="//group[@name='note_group']" position="after">
+                <group name="profit_group" col="6" class="mt-2 mt-md-0">
+                    <group colspan="2"/>
+                    <group colspan="2"/>
+                    <group string="Margin Analysis" colspan="2" class="oe_subtotal_footer gap-sm-1" >
+                        <field name="overhead_type" readonly="1" invisible="1"/>
+                        <field name="total_cost" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                        <field name="total_margin" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}" decoration-danger="margin_percentage &lt; .1" decoration-warning="margin_percentage &gt; .1 and margin_percentage &lt; .2"  decoration-success="margin_percentage &gt; .2"/>
+                        <field name="margin_percentage" string="Margin (%)" widget="percentage" readonly="1" decoration-danger="margin_percentage &lt; .1" decoration-warning="margin_percentage &gt; .1 and margin_percentage &lt; .2"  decoration-success="margin_percentage &gt; .2"/>
+                        <field name="margin_dashboard" nolabel="1" widget="margin_dashboard_widget" invisible="0" />
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_order_line_tree_margin_inherit" model="ir.ui.view">
+        <field name="name">sale.order.line.tree.margin.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <!-- Inject new columns after price_subtotal -->
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_unit']"
+                   position="before">
+                <field name="cost_snapshot" string="Unit Cost (Landed)" readonly="1" optional="hide"/>
+                <field name="overhead_snapshot" string="Unit Overhead" readonly="1" optional="hide"/>
+                <field name="total_unit_cost" string="Total Unit Cost" readonly="1" optional="hide"/>
+            </xpath>            
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_subtotal']" position="before">
+                <field name="total_cost_snapshot" string="Total Cost (Landed)" readonly="1" optional="hide"/>
+                <field name="total_overhead_snapshot" string="Total Overhead" readonly="1" optional="hide"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/list/field[@name='price_subtotal']" position="after">
+                <field name="total_cost" string="Total Cost" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                <field name="margin" string="Margin" readonly="1" widget="monetary" options="{'currency_field': 'currency_id'}" decoration-danger="margin_percentage &lt; .1" decoration-warning="margin_percentage &gt; .1 and margin_percentage &lt; .2"  decoration-success="margin_percentage &gt; .2"/>
+                <field name="margin_percentage" string="Margin %" readonly="1" widget="percentage" decoration-danger="margin_percentage &lt; .1" decoration-warning="margin_percentage &gt; .1 and margin_percentage &lt; .2"  decoration-success="margin_percentage &gt; .2"/>
+                <field name="landed_cost_breakdown" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

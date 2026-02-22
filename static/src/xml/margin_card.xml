@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="sale_margin_engine.MarginDashboardWidget">
+        <button type="button" class="btn btn-primary" t-on-click="openDashboard">
+            Margin Breakdown Analysis
+        </button>
+    </t>
+
+    <t t-name="sale_margin_engine.MarginDashboardPopup">
+        <Dialog title="'Margin Breakdown Analysis'" size="'xl'">
+            <div class="container p-3">
+                <h5>Overhead Method Applied: <span t-esc="props.overheadType" style="text-transform: capitalize;"/></h5>
+                <table class="table table-borderless table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th/>
+                            <th>Product</th>
+                            <th class="text-end">Sold Qty</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Unit Cost (Landed applied)</th>
+                            <th class="text-end">Overhead</th>
+                            <th class="text-end">Margin</th>
+                            <th class="text-end">Margin %</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-foreach="props.lines" t-as="line" t-key="line_index">
+                            <tr style="cursor: pointer;" t-on-click="() => this.toggleRow(line_index)">
+                                <td/>
+                                <td class="text-muted">
+                                    <t t-if="expanded[line_index]">▾  </t>
+                                    <t t-else="">▸  </t>
+                                    <t t-esc="line.product_name"/>
+                                </td>
+                                <td class="text-end" t-esc="line.qty"/>
+                                <td class="text-end" t-esc="formatCurrency(line.unit_price)"/>
+                                <td class="text-end" t-esc="formatCurrency(line.unit_cost)"/>
+                                <td class="text-end" t-esc="formatCurrency(line.overhead)"/>
+                                <td class="text-end" t-att-class="marginColor(line.margin_percentage)" t-esc="formatCurrency(line.margin)"/>
+                                <td class="text-end" t-att-class="marginColor(line.margin_percentage)" t-esc="formatPercent(line.margin_percentage)"/>
+                            </tr>
+                            <!-- Expanded Detail Row -->
+                            <t t-if="expanded[line_index]">
+                                <!-- Landed Cost Header -->
+                                <tr class="table-light">
+                                    <td/>
+                                    <td colspan="7" class="py-1 ps-4">
+                                        <span class="fw-bold text-muted small">📦 Landed Cost Breakdown</span>
+                                    </td>
+                                </tr>
+                                <t t-if="getLandedCosts(line).length">
+                                    <tr>
+                                        <th/>
+                                        <th/>
+                                        <th class="text-muted">Description</th>
+                                        <th class="text-muted">Method</th>
+                                        <th class="text-muted">Unit Cost</th>
+                                        <th class="text-muted">Total Cost</th>
+                                        <th/>
+                                        <th/>
+                                    </tr>
+                                    <t t-foreach="getLandedCosts(line)" t-as="lc" t-key="lc.label">
+                                        <tr class="table-light fst-italic small text-muted">
+                                            <td/>
+                                            <td/>
+                                            <td class="ps-4" t-esc="lc.label" style="text-transform: capitalize;"/>
+                                            <td class="ps-4" t-esc="lc.split_method" style="text-transform: capitalize;"/>
+                                            <td t-esc="formatCurrency(lc.per_unit)"/>
+                                            <td t-esc="formatCurrency(lc.amount)"/>
+                                            <td/>
+                                            <td/>
+                                        </tr>
+                                    </t>
+                                </t>
+                                <t t-else="">
+                                    <tr class="table-light">
+                                        <td/>
+                                        <td colspan="7" class="ps-4 text-muted fst-italic small">No landed costs found.</td>
+                                    </tr>
+                                </t>
+                                <!-- Overhead Header -->
+                                <tr class="table-light">
+                                    <td/>
+                                    <td colspan="7" class="py-1 ps-4">
+                                        <span class="fw-bold text-muted small">⚙️ Overhead Allocation</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th/>
+                                    <th/>
+                                    <th class="text-muted">Product Category</th>
+                                    <th class="text-muted">Analytic Account</th>
+                                    <th class="text-muted">Per Unit Overhead</th>
+                                    <th class="text-muted">Total Overhead</th>
+                                    <th/>
+                                    <th/>
+                                </tr>
+                                <tr class="table-light fst-italic small text-muted">
+                                    <td/>
+                                    <td/>
+                                    <td class="ps-4" t-esc="line.product_category"/>
+                                    <td class="ps-4" t-esc="line.analytic_account"/>
+                                    <td t-esc="formatCurrency(line.overhead)"/>
+                                    <td t-esc="formatCurrency(line.overhead * line.qty)"/>
+                                    <td/>
+                                    <td/>
+                                </tr>
+                                <!-- Spacer -->
+                                <tr class="table-light">
+                                    <td colspan="8" style="height: 6px;"/>
+                                </tr>
+                            </t>
+                        </t>
+                    </tbody>
+                    <tfoot class="table-secondary fw-bold">
+                        <tr>
+                            <td>Totals</td>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td/>
+                            <td class="text-end" t-att-class="marginColor(totals.marginPct)" t-esc="formatCurrency(totals.totalMargin)"/>
+                            <td class="text-end" t-att-class="marginColor(totals.marginPct)" t-esc="formatPercent(totals.marginPct)"/>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </Dialog>
+    </t>
+
+</templates>
